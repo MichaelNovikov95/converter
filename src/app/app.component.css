@@ -1,0 +1,33 @@
+.header {
+  margin-bottom: 25px;
+}
+
+.header-title {
+  font-size: 48px;
+  text-align: center;
+}
+
+.header-info_block {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-gap: 32px;
+  margin-top: 20px;
+  align-items: center;
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.header-info_block-exchange-rate {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+}
+
+.header-info_block-exchange-rate_element {
+  font-size: 21px;
+  line-height: 18px;
+}
+
+.header-info_block-exchange-rate_element:last-child {
+  margin-top: 10px;
+}

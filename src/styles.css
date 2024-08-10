@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+*,
+*:after,
+*:before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: "Courier New", Courier, monospace;
+  background: #000000a8;
+  color: white;
+}
+
+.wrapper {
+  padding: 25px 30px;
+}
