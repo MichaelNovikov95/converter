@@ -1,80 +1,104 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CurrencyService } from '../data/services/currency.service';
-import { FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-converter',
   standalone: true,
-  imports: [],
+  imports: [ReactiveFormsModule],
   templateUrl: './converter.component.html',
   styleUrl: './converter.component.css',
 })
-export class ConverterComponent {
-  currencyService = inject(CurrencyService);
-  first_currency_amount = '';
-  second_currency_amount = '';
-  selectedFirstCurrency = '';
-  selectedSecondCurrency = '';
+export class ConverterComponent implements OnDestroy {
+  private subscriptions = new Subscription();
 
-  onSelected(currency: string, value: string): void {
-    const parsedFirstAmount = Number(this.first_currency_amount);
-    const parsedSecondAmount = Number(this.second_currency_amount);
-    if (currency === 'firstCurrency') {
-      this.selectedFirstCurrency = value;
-      if (parsedFirstAmount !== 0 && this.selectedSecondCurrency !== '') {
-        this.currencyService
-          .getExchangeTotalAmount(
-            this.selectedSecondCurrency,
-            this.selectedFirstCurrency,
-            parsedFirstAmount
-          )
-          .subscribe((v) => {
-            this.second_currency_amount = String(v.conversion_result);
-          });
-      }
-    } else if (currency === 'secondCurrency') {
-      this.selectedSecondCurrency = value;
-      if (parsedSecondAmount !== 0 && this.selectedFirstCurrency !== '') {
-        this.currencyService
-          .getExchangeTotalAmount(
-            this.selectedFirstCurrency,
-            this.selectedSecondCurrency,
-            parsedSecondAmount
-          )
-          .subscribe((v) => {
-            this.first_currency_amount = String(v.conversion_result);
-          });
-      }
-    } else {
-      return;
+  CurrencyForm = new FormGroup({
+    first_currency_amount: new FormControl(''),
+    selectedFirstCurrency: new FormControl(''),
+    second_currency_amount: new FormControl(''),
+    selectedSecondCurrency: new FormControl(''),
+  });
+
+  constructor(private currencyService: CurrencyService) {}
+
+  ngOnInit() {
+    this.initializeSubscriptions();
+  }
+
+  private initializeSubscriptions() {
+    this.subscriptions.add(
+      this.CurrencyForm.get('first_currency_amount')?.valueChanges.subscribe(
+        () => {
+          this.updateSecondAmount();
+        }
+      )
+    );
+
+    this.subscriptions.add(
+      this.CurrencyForm.get('selectedFirstCurrency')?.valueChanges.subscribe(
+        () => {
+          this.updateSecondAmount();
+        }
+      )
+    );
+
+    this.subscriptions.add(
+      this.CurrencyForm.get('second_currency_amount')?.valueChanges.subscribe(
+        () => {
+          this.updateFirstAmount();
+        }
+      )
+    );
+
+    this.subscriptions.add(
+      this.CurrencyForm.get('selectedSecondCurrency')?.valueChanges.subscribe(
+        () => {
+          this.updateFirstAmount();
+        }
+      )
+    );
+  }
+
+  updateSecondAmount() {
+    const input1Value = Number(
+      this.CurrencyForm.get('first_currency_amount')?.value
+    );
+    const select1Value = this.CurrencyForm.get('selectedFirstCurrency')?.value;
+    const select2Value = this.CurrencyForm.get('selectedSecondCurrency')?.value;
+
+    if (select1Value && select2Value) {
+      this.currencyService
+        .getExchangeTotalAmount(select2Value, select1Value, input1Value)
+        .subscribe((v) => {
+          this.CurrencyForm.get('second_currency_amount')?.patchValue(
+            String(v.conversion_result),
+            { emitEvent: false }
+          );
+        });
     }
   }
 
-  fetchCurrency(currency: string, value: string): void {
-    const parsedValue = Number(value);
+  updateFirstAmount() {
+    const input2Value = Number(
+      this.CurrencyForm.get('second_currency_amount')?.value
+    );
+    const select1Value = this.CurrencyForm.get('selectedFirstCurrency')?.value;
+    const select2Value = this.CurrencyForm.get('selectedSecondCurrency')?.value;
 
-    if (!this.selectedFirstCurrency || !this.selectedSecondCurrency) return;
-
-    if (currency === 'firstCurrencyAmount') {
+    if (select1Value && select2Value) {
       this.currencyService
-        .getExchangeTotalAmount(
-          this.selectedSecondCurrency,
-          this.selectedFirstCurrency,
-          parsedValue
-        )
+        .getExchangeTotalAmount(select1Value, select2Value, input2Value)
         .subscribe((v) => {
-          this.second_currency_amount = String(v.conversion_result);
-        });
-    } else if (currency === 'secondCurrencyAmount') {
-      this.currencyService
-        .getExchangeTotalAmount(
-          this.selectedFirstCurrency,
-          this.selectedSecondCurrency,
-          parsedValue
-        )
-        .subscribe((v) => {
-          this.first_currency_amount = String(v.conversion_result);
+          this.CurrencyForm.get('first_currency_amount')?.patchValue(
+            String(v.conversion_result),
+            { emitEvent: false }
+          );
         });
     }
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 }

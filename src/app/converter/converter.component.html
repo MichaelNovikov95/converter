@@ -1,46 +1,40 @@
-<div class="converter-wrapper">
-  <div class="currency-wrapper">
-    <h3 class="currency-title">Amount #1</h3>
-    <input
-      class="input"
-      #firstCurrencyAmount
-      [value]="first_currency_amount"
-      placeholder="E.g. 100.00"
-      (keyup)="fetchCurrency('firstCurrencyAmount', firstCurrencyAmount.value)"
-    />
-    <select
-      class="currency-select"
-      name="first_currency"
-      #firstCurrency
-      (change)="onSelected('firstCurrency', firstCurrency.value)"
-    >
-      <option value="NULL" selected></option>
-      <option value="UAH">UAH</option>
-      <option value="USD">USD</option>
-      <option value="EUR">EUR</option>
-    </select>
-  </div>
-  <div class="currency-wrapper">
-    <h3 class="currency-title">Amount #2</h3>
-    <input
-      class="input"
-      #secondCurrencyAmount
-      [value]="second_currency_amount"
-      placeholder="E.g. 100.00"
-      (keyup)="
-        fetchCurrency('secondCurrencyAmount', secondCurrencyAmount.value)
-      "
-    />
-    <select
-      class="currency-select"
-      #secondCurrency
-      name="second_currency"
-      (change)="onSelected('secondCurrency', secondCurrency.value)"
-    >
-      <option value="NULL" selected></option>
-      <option value="UAH">UAH</option>
-      <option value="USD">USD</option>
-      <option value="EUR">EUR</option>
-    </select>
-  </div>
+<div>
+  <form class="converter-wrapper" [formGroup]="CurrencyForm">
+    <div class="currency-wrapper">
+      <h3 class="currency-title">Amount #1</h3>
+      <input
+        class="input"
+        formControlName="first_currency_amount"
+        placeholder="E.g. 100.00"
+      />
+      <select
+        class="currency-select"
+        name="first_currency"
+        formControlName="selectedFirstCurrency"
+      >
+        <option value="NULL" selected></option>
+        <option value="UAH">UAH</option>
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+      </select>
+    </div>
+    <div class="currency-wrapper">
+      <h3 class="currency-title">Amount #2</h3>
+      <input
+        class="input"
+        formControlName="second_currency_amount"
+        placeholder="E.g. 100.00"
+      />
+      <select
+        class="currency-select"
+        formControlName="selectedSecondCurrency"
+        name="second_currency"
+      >
+        <option value="NULL" selected></option>
+        <option value="UAH">UAH</option>
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+      </select>
+    </div>
+  </form>
 </div>

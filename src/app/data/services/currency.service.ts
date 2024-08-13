@@ -9,9 +9,8 @@ import { ConvertedCurrency } from '../interfaces/converted_currency.interface';
 export class CurrencyService {
   http = inject(HttpClient);
 
-  baseApiUrl = 'https://v6.exchangerate-api.com/v6/';
-  APIKey = '4ef2cb7c4cdae7345ccfc7d8';
-  constructor() {}
+  private baseApiUrl = 'https://v6.exchangerate-api.com/v6/';
+  private APIKey = import.meta.env.NG_APP_API_KEY;
 
   getCurrencyExchange(baseCurrency: string, targetCurrency: string) {
     return this.http.get<Currency>(
